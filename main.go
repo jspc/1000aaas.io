@@ -1,6 +1,7 @@
 package main
 
 import (
+    "os"
     "bytes"
     "fmt"
     "net/http"
@@ -40,11 +41,17 @@ func proxy (c web.C, w http.ResponseWriter, r *http.Request) {
     fmt.Fprint(w, response)
 }
 
+func healthcheck(c web.C, w http.ResponseWriter, r *http.Request) {
+    name, _ := os.Hostname()
+    fmt.Fprintf(w, "Healthy! host: %s", name)
+}
+
 func main() {
     for i := 0; i < 1000; i++ {
         a.WriteString("a")
     }
 
+    goji.Get("/", healthcheck)
     goji.Get("/v1/a", get_a)
     goji.Get("/v1/proxy/:proxy", proxy)
     goji.Serve()
