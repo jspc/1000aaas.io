@@ -15,13 +15,13 @@ var a bytes.Buffer
 var response string
 var url string
 
-func get_a(c web.C, w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, a.String())
-}
-
 func get_root(c web.C, w http.ResponseWriter, r *http.Request) {
     name, _ := os.Hostname()
     fmt.Fprintf(w, "Healthy! host: %s", name)
+}
+
+func get_a(c web.C, w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, a.String())
 }
 
 func main() {
