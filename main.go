@@ -5,7 +5,7 @@ import (
     "bytes"
     "fmt"
     "net/http"
-    "io/ioutil"
+    "strconv"
 
     "github.com/zenazn/goji"
     "github.com/zenazn/goji/web"
@@ -14,36 +14,41 @@ import (
 var a bytes.Buffer
 var response string
 var url string
+var count_int int
+
+func get_root(c web.C, w http.ResponseWriter, r *http.Request) {
+    name, _ := os.Hostname()
+    fmt.Fprintf(w, "Healthy! host: %s", name)
+}
 
 func get_a(c web.C, w http.ResponseWriter, r *http.Request) {
     fmt.Fprintf(w, a.String())
 }
 
-func proxy (c web.C, w http.ResponseWriter, r *http.Request) {
-   switch c.URLParams["proxy"] {
-    default:
-        url = "http://jelly.stupids.org:6565"
-    }
-
-    req, err := http.NewRequest("Get", url, nil)
-    if err != nil {
-        response = err.Error()
-    } else {
-        defer req.Body.Close()
-        body, err := ioutil.ReadAll(req.Body)
-        if err != nil {
-            response = err.Error()
-        } else {
-            response = string(body[:])
-        }
-    }
-
-    fmt.Fprint(w, response)
+func get_cock(c web.C, w http.ResponseWriter, r *http.Request) {
+    cock := cock(20)
+    fmt.Fprintf(w, cock)
 }
 
-func healthcheck(c web.C, w http.ResponseWriter, r *http.Request) {
-    name, _ := os.Hostname()
-    fmt.Fprintf(w, "Healthy! host: %s", name)
+func get_cock_with_count(c web.C, w http.ResponseWriter, r *http.Request) {
+    count_int, err := strconv.Atoi(c.URLParams["count"])
+
+    if err != nil {
+        http.Error(w, "Pass me a number, dick", 400)
+    }
+
+    cock := cock(count_int)
+    fmt.Fprintf(w, cock)
+}
+
+func cock(count int) string{
+    var cock bytes.Buffer
+    cock.WriteString("8")
+    for i := 0; i < count; i++ {
+        cock.WriteString("=")
+    }
+    cock.WriteString("D")
+    return cock.String()
 }
 
 func main() {
@@ -51,8 +56,9 @@ func main() {
         a.WriteString("a")
     }
 
-    goji.Get("/", healthcheck)
+    goji.Get("/", get_root)
     goji.Get("/v1/a", get_a)
-    goji.Get("/v1/proxy/:proxy", proxy)
+    goji.Get("/v1/cock", get_cock)
+    goji.Get("/v1/cock/:count", get_cock_with_count)
     goji.Serve()
 }
