@@ -60,5 +60,8 @@ func main() {
     goji.Get("/v1/a", get_a)
     goji.Get("/v1/cock", get_cock)
     goji.Get("/v1/cock/:count", get_cock_with_count)
+
+    /* Financial Times specific API test magic */
+    goji.Get("/1000aaas/v1/a", get_a)
     goji.Serve()
 }
